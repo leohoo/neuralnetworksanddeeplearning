@@ -3,17 +3,21 @@ import numpy as np
 def sigmoid(z):
     return 1/(1+np.exp(-z))
 
+def sigmoid_prime(z):
+    return sigmoid(z)*(1-sigmoid(z))
+
 class Network:
 
     def __init__(self, sizes):
-        self.num_layers = sizes
+        self.num_layers = len(sizes)
+        self.sizes = sizes
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
-        self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]
+        self.weights = [np.random.randn(y, x) for x, y in list(zip(sizes[:-1], sizes[1:]))]
 
     def feedforward(self, a):
         # return the output of the network if "a" is input
         assert(a.shape[1] == 1)
-        for b, w in zip(self.biases, self.weights):
+        for b, w in list(zip(self.biases, self.weightsi)):
             a = sigmoid(np.dot(w, a) + b)
         return a
 
@@ -38,11 +42,11 @@ class Network:
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         for x, y in mini_batch:
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
-            nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
-            nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+            nabla_b = [nb + dnb for nb, dnb in list(zip(nabla_b, delta_nabla_b))]
+            nabla_w = [nw + dnw for nw, dnw in list(zip(nabla_w, delta_nabla_w))]
 
-        self.weights = [w - eta/len(mini_batch)*nw for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b - eta/len(mini_batch)*nb for b, nb in zip(self.biases, nabla_b)]
+        self.weights = [w - eta/len(mini_batch)*nw for w, nw in list(zip(self.weights, nabla_w))]
+        self.biases = [b - eta/len(mini_batch)*nb for b, nb in list(zip(self.biases, nabla_b))]
 
     def backprop(self, x, y):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
@@ -52,7 +56,7 @@ class Network:
         activation = x
         activations = [x]
         zs = []
-        for b, w in zip(self.biases, self.weights):
+        for b, w in list(zip(self.biases, self.weights)):
             z = np.dot(w, activation) + b
             zs.append(z)
             activation = sigmoid(z)
@@ -76,7 +80,3 @@ class Network:
 
     def cost_derivative(self, output_activations, y):
         return output_activations - y
-
-    def sigmoid_prime(z):
-        return sigmoid(z)*(1-sigmoid(z))
-        
