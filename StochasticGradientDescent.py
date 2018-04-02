@@ -17,7 +17,7 @@ class Network:
     def feedforward(self, a):
         # return the output of the network if "a" is input
         assert(a.shape[1] == 1)
-        for b, w in list(zip(self.biases, self.weightsi)):
+        for b, w in list(zip(self.biases, self.weights)):
             a = sigmoid(np.dot(w, a) + b)
         return a
 
@@ -27,13 +27,13 @@ class Network:
         for j in range(epochs):
             np.random.shuffle(training_data)
             mini_batches = [training_data[k:k+mini_batch_size] for k in range(0, n, mini_batch_size)]
-        for mini_batch in mini_batches:
-            self.update_mini_batch(mini_batch, eta)
+            for mini_batch in mini_batches:
+                self.update_mini_batch(mini_batch, eta)
 
-        if test_data:
-            print("Epoch {0}: {1} / {2}".format(j, self.evaluate(test_data), n_test))
-        else:
-            print("Epoch %d complete." % j)
+            if test_data:
+                print("Epoch {0}: {1} / {2}".format(j, self.evaluate(test_data), n_test))
+            else:
+                print("Epoch %d complete." % j)
 
     def update_mini_batch(self, mini_batch, eta):
         # eta is the learning rate
@@ -67,11 +67,11 @@ class Network:
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
 
         for l in range(2, self.num_layers):
-            z = zs[-1]
+            z = zs[-l]
             sp = sigmoid_prime(z)
             delta = np.dot(self.weights[-l + 1].transpose(), delta) * sp
-            nabla_b[-1] = delta
-            nabla_w[-1] = np.dot(delta, activations[-l - 1].transpose())
+            nabla_b[-l] = delta
+            nabla_w[-l] = np.dot(delta, activations[-l - 1].transpose())
         return nabla_b, nabla_w
 
     def evaluate(self, test_data):
